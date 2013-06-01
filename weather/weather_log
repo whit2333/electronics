@@ -1,0 +1,16 @@
+#!/bin/bash
+
+
+cat /dev/ttyACM0 &> /tmp/pressure.log & 
+
+sleep 5 
+echo "Syncing time..."
+TZ_adjust=-5
+echo T$(($(date +%s)+60*60*$TZ_adjust)) > /dev/ttyACM0
+sleep 5 
+echo "done"
+
+tail -n 1 -f /tmp/pressure.log | tee -a station_weather.dat
+
+wait
+

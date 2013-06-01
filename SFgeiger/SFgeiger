@@ -1,0 +1,24 @@
+#!/bin/bash
+# count per minute script for Sparkfun Geiger counter https://www.sparkfun.com/products/9848?
+# beforehand run in the same directory this command: screen -L /dev/ttyUSB0 9600
+# this logs the serial output of the counter to the file screenlog.0
+#  * 10^0 CPS = .000055 R/hr (Roentgen)
+# * 10^1 CPS = .00055 R/hr
+#  * 10^3 CPS = .055 R/hr
+while true; do
+        rm sfgeiger.log
+        cat  /dev/ttyUSB0 > sfgeiger.log &
+        #jobs 
+        sleep 60 
+        kill %1 &> /dev/null 
+        counts=`cat sfgeiger.log | wc -c `
+        echo "counts = $counts"
+        doserate=`echo "scale=10;${counts}.0/60.0*0.00005" | bc -l`
+        # with the cap of you have a weight factor of 20 for alphas
+        rem=`echo "scale=10;0.96*$doserate*20*1000.0" | bc -l`
+        echo "$doserate R/hr"
+        echo `date +%s`" "$counts" CPM  "$doserate" R/hr "$rem" mrem/hr " | tee -a cpm_sfgeiger.dat
+        gnuplot sfgeiger.gnu
+        cp sfgeiger.png ~/public_html/geiger
+done
+
