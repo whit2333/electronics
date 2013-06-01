@@ -1,0 +1,57 @@
+#!/bin/bash
+
+nmeas=`seq 1000`
+clear
+
+echo ""
+echo ""
+echo ""
+echo ""
+
+echo "Are "
+echo "       you  "
+echo "               drunk ??? "
+echo ""
+sleep 1
+echo "Well... Let's see." 
+echo ""
+
+echo "Enter your name"
+
+echo "then press ENTER to continue"
+echo -e ""
+read a
+
+output=`fuser -f /dev/ttyACM0 `
+if [ "$output" ]
+  then 
+    process=`fuser  -f /dev/ttyACM0 | awk '{print $1}' `
+    kill $process 
+    echo ""
+fi
+
+cat /dev/ttyACM0 > alcohol.dat & 
+
+
+echo ""
+echo " Make sure you are 6 to 12  from the sensor..."
+sleep 2 
+echo ""
+echo " Ready ..."
+sleep 1
+echo ""
+echo " Get set ..."
+sleep 1
+echo ""
+
+echo " BLOW !"
+
+for imeas in $nmeas 
+do
+   current=`tail -n 1  alcohol.dat | awk '{printf("%5.4f %s %s %s", $2, $3, $4, $5)}'`
+   echo -e  "$current \r" | tee -a alcohol-$a.out
+sleep 0.25 
+done
+
+
+
