@@ -4,7 +4,7 @@
 # and  set ARDUINO_SRC to proper location of the arduino source code
 
 PREFIX=/usr/local
-ARDUINO_SRC=/home/whit/arduino/Arduino
+ARDUINO_SRC=/home/whit/arduino/arduino-1.0.5
 
 HDRS = Arduino.h binary.h Client.h HardwareSerial.h IPAddress.h new.h pins_arduino.h Platform.h Printable.h Print.h \
            Server.h Stream.h Udp.h USBAPI.h USBCore.h USBDesc.h WCharacter.h wiring_private.h WString.h
