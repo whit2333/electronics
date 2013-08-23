@@ -15,6 +15,7 @@
 #define TIME_REQUEST  7    // ASCII bell character requests a time sync message 
 
 //______________________________________________________________________________
+int                 alcohol_channel   = 1;
 const unsigned char OSS               = 0;  // Oversampling Setting
 float               alcohol_baseline  = 0.0;
 bool                subtract_baseline = true; /// Set to subtract baseline measurment from reading done in setup
@@ -28,6 +29,7 @@ void            loop();
 void            booze_or_water_interrupt();
 void            booze_or_water();
 void            blowing_lights();
+void            flashing_lights(int t);
 void            water_lights();
 void            booze_lights();
 float           read_alcohol();
@@ -59,10 +61,14 @@ void setup()
    //pinMode(3, OUTPUT);  // channel B  
    //pinMode(4, OUTPUT);  // channel c  
 
-   pinMode(7, OUTPUT);  // channel F  
-   pinMode(8, OUTPUT);  // channel G  
+   pinMode(5, OUTPUT);  // channel D 
+   pinMode(6, OUTPUT);  // channel E
+   pinMode(7, OUTPUT);  // channel F  - booze 
+   pinMode(8, OUTPUT);  // channel G  - water
    pinMode(9, OUTPUT);  // channel H  
 
+   digitalWrite(5, LOW);   // turn the EL channel off 
+   digitalWrite(6, LOW);   // turn the EL channel off 
    digitalWrite(7, LOW);   // turn the EL channel off 
    digitalWrite(8, LOW);   // turn the EL channel off 
    digitalWrite(9, LOW);   // turn the EL channel off 
@@ -73,6 +79,7 @@ void setup()
    pinMode(13, OUTPUT);    
 
    // Interrupt for taking a measurement. 
+   // Interrupt is on digital channel 2
    attachInterrupt(0, booze_or_water_interrupt, FALLING);
 
    //setTime(1,1,1,2,3,2013); 
@@ -84,9 +91,11 @@ void setup()
 void loop()
 {
    // elwire
-   digitalWrite(9, HIGH);   // turn the EL channel on
-   digitalWrite(8, LOW);   // turn the EL channel on
-   digitalWrite(7, LOW);   // turn the EL channel on
+   //digitalWrite(9, HIGH);   // turn the EL channel on
+   //digitalWrite(8, LOW);   // turn the EL channel on
+   //digitalWrite(7, LOW);   // turn the EL channel on
+
+   flashing_lights(400);
 
    if(Serial.available() )
    {
@@ -98,10 +107,20 @@ void loop()
    //       digitalClockDisplay();  
    //digitalClockDisplay();  
 
-   delay(300);
-   digitalWrite(9, LOW);   // turn the EL channel on
-   delay(1200);
+   //delay(1200);
    if( measure_alcohol ) {
+      digitalWrite(9, HIGH);   // turn the EL channel on
+      delay(100);
+      digitalWrite(9, LOW);   // turn the EL channel on
+      delay(100);
+      digitalWrite(9, HIGH);   // turn the EL channel on
+      delay(100);
+      digitalWrite(9, LOW);   // turn the EL channel on
+      delay(100);
+      digitalWrite(9, HIGH);   // turn the EL channel on
+      delay(100);
+      digitalWrite(9, LOW);   // turn the EL channel on
+      delay(100);
       booze_or_water();
       measure_alcohol = false;
    }
@@ -201,36 +220,50 @@ void water_lights(){
       delay(1500);
    }
 }
+//______________________________________________________________________________
+void flashing_lights(int t){
+   int i;
+   for(i=9;i>=5;i--){
+      digitalWrite(i, HIGH);  
+      delay(t);
+      digitalWrite(i, LOW);   
+      delay(t);
+   }
+}
 
 //______________________________________________________________________________
 void blowing_lights(){
-   digitalWrite(9, LOW);   // turn the EL channel on
-   digitalWrite(8, HIGH);   // turn the EL channel on
-   digitalWrite(7, LOW);   // turn the EL channel on
-   delay(300);
-   digitalWrite(9, HIGH);   // turn the EL channel on
-   digitalWrite(8, LOW);   // turn the EL channel on
-   digitalWrite(7, HIGH);   // turn the EL channel on
-   delay(300);
-   digitalWrite(9, LOW);   // turn the EL channel on
-   digitalWrite(8, HIGH);   // turn the EL channel on
-   digitalWrite(7, LOW);   // turn the EL channel on
-   delay(200);
-   digitalWrite(9, HIGH);   // turn the EL channel on
-   digitalWrite(8, LOW);   // turn the EL channel on
-   digitalWrite(7, HIGH);   // turn the EL channel on
-   delay(200);
-   digitalWrite(9, LOW);   // turn the EL channel on
-   digitalWrite(8, HIGH);   // turn the EL channel on
-   digitalWrite(7, LOW);   // turn the EL channel on
-   delay(100);
-   digitalWrite(9, HIGH);   // turn the EL channel on
-   digitalWrite(8, LOW);   // turn the EL channel on
-   digitalWrite(7, HIGH);   // turn the EL channel on
-   delay(100);
-   digitalWrite(9, LOW);   // turn the EL channel on
-   digitalWrite(8, LOW);   // turn the EL channel on
-   digitalWrite(7, LOW);   // turn the EL channel on
+   flashing_lights(100); 
+   flashing_lights(100); 
+   //flashing_lights(300); 
+   //flashing_lights(200); 
+   //digitalWrite(9, LOW);   // turn the EL channel on
+   //digitalWrite(8, HIGH);   // turn the EL channel on
+   //digitalWrite(7, LOW);   // turn the EL channel on
+   //delay(300);
+   //digitalWrite(9, HIGH);   // turn the EL channel on
+   //digitalWrite(8, LOW);   // turn the EL channel on
+   //digitalWrite(7, HIGH);   // turn the EL channel on
+   //delay(300);
+   //digitalWrite(9, LOW);   // turn the EL channel on
+   //digitalWrite(8, HIGH);   // turn the EL channel on
+   //digitalWrite(7, LOW);   // turn the EL channel on
+   //delay(200);
+   //digitalWrite(9, HIGH);   // turn the EL channel on
+   //digitalWrite(8, LOW);   // turn the EL channel on
+   //digitalWrite(7, HIGH);   // turn the EL channel on
+   //delay(200);
+   //digitalWrite(9, LOW);   // turn the EL channel on
+   //digitalWrite(8, HIGH);   // turn the EL channel on
+   //digitalWrite(7, LOW);   // turn the EL channel on
+   //delay(100);
+   //digitalWrite(9, HIGH);   // turn the EL channel on
+   //digitalWrite(8, LOW);   // turn the EL channel on
+   //digitalWrite(7, HIGH);   // turn the EL channel on
+   //delay(100);
+   //digitalWrite(9, LOW);   // turn the EL channel on
+   //digitalWrite(8, LOW);   // turn the EL channel on
+   //digitalWrite(7, LOW);   // turn the EL channel on
 
 }
 
@@ -265,7 +298,7 @@ void print_alcohol(){
 //______________________________________________________________________________
 float           GetAlcoholResistance(){
    // Returns the resistance
-   float Rs =10.0 * ( (1024.0/float(analogRead(1))) -1.0 );
+   float Rs =10.0 * ( (1024.0/float(analogRead(alcohol_channel))) -1.0 );
    return(Rs); 
 }
 
