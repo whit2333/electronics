@@ -6,12 +6,16 @@
 PREFIX=/usr/local
 ARDUINO_SRC=/home/whit/arduino/Arduino-1.6.5
 
-HDRS = Arduino.h binary.h Client.h HardwareSerial.h IPAddress.h new.h pins_arduino.h Platform.h Printable.h Print.h \
-           Server.h Stream.h Udp.h USBAPI.h USBCore.h USBDesc.h WCharacter.h wiring_private.h WString.h
+HDRS = Arduino.h binary.h Client.h HardwareSerial.h IPAddress.h \
+       new.h pins_arduino.h Platform.h Printable.h Print.h \
+       Server.h Stream.h Udp.h USBAPI.h USBCore.h USBDesc.h \
+       WCharacter.h wiring_private.h WString.h
 
 
-OBJS = WInterrupts.o wiring_analog.o wiring.o wiring_digital.o wiring_pulse.o wiring_shift.o CDC.o HardwareSerial.o \
-           HID.o IPAddress.o main.o new.o Print.o Stream.o Tone.o USBCore.o WMath.o WString.o
+OBJS = WInterrupts.o wiring_analog.o wiring.o wiring_digital.o \
+       wiring_pulse.o wiring_shift.o CDC.o HardwareSerial.o \
+       HID.o IPAddress.o main.o new.o Print.o Stream.o \
+       Tone.o USBCore.o WMath.o WString.o
 
 
 #may need to adjust -mmcu if you have an older atmega168
@@ -23,7 +27,14 @@ CC=avr-gcc
 CPP=avr-gcc
 AR=avr-ar
 
-#------ Time Library ------#
+#------ Standard Arduino Library ------#
+default: all
+
+all: libarduino.a libWire.a libTime.a 
+
+libarduino.a:   ${OBJS}
+	${AR} crs libarduino.a $(OBJS)
+
 libTime.a: libraries/Time/Time.h
 	cp libraries/Time/Time.h .
 	${CPP} ${CPPFLAGS} -c libraries/Time/DateStrings.cpp -Ilibraries/Time
@@ -31,7 +42,6 @@ libTime.a: libraries/Time/Time.h
 	${AR} crs libTime.a Time.o DateStrings.o
 
 
-#------ Wire Library ------#
 libWire.a: $(ARDUINO_SRC)/hardware/arduino/avr/libraries/Wire/Wire.h
 	cp $(ARDUINO_SRC)/hardware/arduino/avr/libraries/Wire/Wire.h .
 	cp $(ARDUINO_SRC)/hardware/arduino/avr/libraries/Wire/utility/twi.h .
@@ -39,13 +49,6 @@ libWire.a: $(ARDUINO_SRC)/hardware/arduino/avr/libraries/Wire/Wire.h
 	${CC} ${CFLAGS} -c $(ARDUINO_SRC)/hardware/arduino/avr/libraries/Wire/utility/twi.c -I$(ARDUINO_SRC)/libraries/Wire/utility
 	${AR} crs libWire.a Wire.o twi.o
 	
-#------ Standard Arduino Library ------#
-default: libarduino.a
-
-all: libarduino.a libWire.a libTime.a 
-
-libarduino.a:   ${OBJS}
-	${AR} crs libarduino.a $(OBJS)
 
 .c.o: ${HDRS}
 	${CC} ${CFLAGS} -c $*.c -lm
@@ -54,7 +57,9 @@ libarduino.a:   ${OBJS}
 	${CPP} ${CPPFLAGS} -c $*.cpp
 
 clean:
-	rm -f ${OBJS} core a.out errs
+	rm -f ${OBJS} 
+	rm -f *.a 
+	rm -f *.o 
 
 install: libarduino.a
 	mkdir -p ${PREFIX}/lib
