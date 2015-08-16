@@ -4,7 +4,7 @@
 # and  set ARDUINO_SRC to proper location of the arduino source code
 
 PREFIX=/usr/local
-ARDUINO_SRC=/home/whit/arduino/arduino-1.0.5
+ARDUINO_SRC=/home/whit/arduino/Arduino-1.6.5
 
 HDRS = Arduino.h binary.h Client.h HardwareSerial.h IPAddress.h new.h pins_arduino.h Platform.h Printable.h Print.h \
            Server.h Stream.h Udp.h USBAPI.h USBCore.h USBDesc.h WCharacter.h wiring_private.h WString.h
@@ -16,11 +16,11 @@ OBJS = WInterrupts.o wiring_analog.o wiring.o wiring_digital.o wiring_pulse.o wi
 
 #may need to adjust -mmcu if you have an older atmega168
 #may also need to adjust F_CPU if your clock isn't set to 16Mhz
-CFLAGS = -I./ -std=gnu99  -DF_CPU=16000000UL -Os -mmcu=atmega328p -lm
-CPPFLAGS = -I./ -DF_CPU=16000000UL -Os -mmcu=atmega328p -lm
+CFLAGS = -I./ -std=gnu99  -DARDUINO=165 -DF_CPU=16000000UL -Os -mmcu=atmega328p -lm
+CPPFLAGS = -I./ -DF_CPU=16000000UL -DARDUINO=165 -Os -mmcu=atmega328p -lm
 
 CC=avr-gcc
-CPP=avr-g++
+CPP=avr-gcc
 AR=avr-ar
 
 #------ Time Library ------#
@@ -32,15 +32,17 @@ libTime.a: libraries/Time/Time.h
 
 
 #------ Wire Library ------#
-libWire.a: $(ARDUINO_SRC)/libraries/Wire/Wire.h
-	cp $(ARDUINO_SRC)/libraries/Wire/Wire.h .
-	cp $(ARDUINO_SRC)/libraries/Wire/utility/twi.h .
-	${CPP} ${CPPFLAGS} -c $(ARDUINO_SRC)/libraries/Wire/Wire.cpp -I$(ARDUINO_SRC)/libraries/Wire/utility
-	${CC} ${CFLAGS} -c $(ARDUINO_SRC)/libraries/Wire/utility/twi.c -I$(ARDUINO_SRC)/libraries/Wire/utility
+libWire.a: $(ARDUINO_SRC)/hardware/arduino/avr/libraries/Wire/Wire.h
+	cp $(ARDUINO_SRC)/hardware/arduino/avr/libraries/Wire/Wire.h .
+	cp $(ARDUINO_SRC)/hardware/arduino/avr/libraries/Wire/utility/twi.h .
+	${CPP} ${CPPFLAGS} -c $(ARDUINO_SRC)/hardware/arduino/avr/libraries/Wire/Wire.cpp -I$(ARDUINO_SRC)/hardware/arduino/avr/libraries/Wire/utility
+	${CC} ${CFLAGS} -c $(ARDUINO_SRC)/hardware/arduino/avr/libraries/Wire/utility/twi.c -I$(ARDUINO_SRC)/libraries/Wire/utility
 	${AR} crs libWire.a Wire.o twi.o
 	
 #------ Standard Arduino Library ------#
 default: libarduino.a
+
+all: libarduino.a libWire.a libTime.a 
 
 libarduino.a:   ${OBJS}
 	${AR} crs libarduino.a $(OBJS)

@@ -29,7 +29,7 @@ void loop()
    for (x=2; x<=9; x++)
    {
       digitalWrite(x, HIGH);   // turn the EL channel on
-      delay(100);              // wait for 1/10 second
+      delay(50);              // wait for 1/10 second
       digitalWrite(x, LOW);    // turn the EL channel off
 
       digitalWrite(10, status);   // blink both status LEDs
