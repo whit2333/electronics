@@ -19,7 +19,7 @@ void setup()
     pinMode(led_pin, OUTPUT);
 }
 
-byte count = 1;
+byte count = 0;
 
 void loop()
 {
@@ -33,5 +33,11 @@ void loop()
    digitalWrite(led_pin, LOW);
    delay(1000);
    count = count + 1;
+
+   char abuf[] = "yo jabrone";
+   if(count == 0){
+      vw_send((uint8_t *)abuf, 10);
+      vw_wait_tx(); // Wait until the whole message is gone
+   }
 }
 

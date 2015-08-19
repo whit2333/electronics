@@ -42,9 +42,8 @@ void loop()
 
         digitalWrite(led_pin, HIGH); // Flash a light to show received good message
 	// Message with a good checksum received, dump it.
-	Serial.print("Got: ");
-
-        snprintf(buffer, 6, "Got: %s", buf);
+        Serial.print("Got:");
+        snprintf(buffer, 7, "%s", buf);
         Serial.print(buffer);
         sprintf(buffer,  "%d", (uint8_t)buf[6]);
         Serial.print(buffer);
