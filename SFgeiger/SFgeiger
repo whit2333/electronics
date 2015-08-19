@@ -1,4 +1,6 @@
 #!/bin/bash
+
+stty -F /dev/ttyUSB0 cs8 9600 ignbrk -brkint -icrnl -imaxbel -opost -onlcr -isig -icanon -iexten -echo -echoe -echok -echoctl -echoke noflsh -ixon -crtscts
 # count per minute script for Sparkfun Geiger counter https://www.sparkfun.com/products/9848?
 # beforehand run in the same directory this command: screen -L /dev/ttyUSB0 9600
 # this logs the serial output of the counter to the file screenlog.0
